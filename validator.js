@@ -127,6 +127,8 @@ export default class Validator {
   }
   validate_ev(e) {
     let el = e.target;
+    if(this.fields.get(el)?.fresh) return
+
     let val = this.get_value(el);
 
     // console.log("validate", e, el);
@@ -151,6 +153,18 @@ export default class Validator {
     }
     return ok;
   }
+  is_error_msg(rsp){
+    if(rsp===false) return true
+    if(!rsp) return false
+    if(rsp===true) return false
+    if(typeof rsp === 'string') return rsp
+    if(typeof rsp === 'object'){
+      if(rsp.ok===false){
+        return rsp.msg
+      }
+    }
+    return false
+  }
   async validate(el, name, val) {
     let rules = this.rules.r[name] ? this.rules.r[name] : [];
     console.log("rules...", name, this.rules.r);
@@ -162,7 +176,8 @@ export default class Validator {
       if (m) {
         let promise = Promise.resolve(m(val, el)).then((ok) => {
           console.log("validation result", rule, ok);
-          if (ok !== true) msg.push(this.get_message(name, rule));
+          let rsp_msg = this.is_error_msg(ok)
+          if (rsp_msg) msg.push(this.get_message(name, rule));
         });
         let r = await promise;
       } else {
