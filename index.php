@@ -12,10 +12,10 @@ $the_route = match ([$http_method, $path]) {
 
 function handle_request($page, $params = []) {
     if ($page == 'check_username') {
-        sleep(3);
+        sleep(2);
         $resp = ['ok' => true, 'in' => $params];
         if ($params['value'] == 'anna' || $params['value'] == 'otto') {
-            $resp = ['ok' => false, 'msg' => 'Name is already taken'];
+            $resp = ['ok' => false, 'msg' => 'This name is already taken'];
         }
         json_resp($resp);
     }
@@ -74,7 +74,8 @@ $rules = [
     'breakfast' => ['required']
 ];
 $messages = [
-    'email' => ['required' => 'E-Mail-Adresse darf nicht leer sein', 'email' => 'Ungültige E-Mail']
+    'email' => ['required' => 'We need your email address', 'email' => 'This is not a valid email address'],
+    'nickname' => ['required' => 'Because we are your friends, we need to know your nickname']
 ];
 
 ?>
@@ -128,13 +129,15 @@ $messages = [
 
             <div class="mb-3"><label for="email" class="form-label">Email address</label>
                 <input type="email" value="rw" name="email" class="form-control" id="email" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                <div id="emailHelp" class="form-text">required AND email rule</div>
                 <div class="invalid-feedback">
 
                 </div>
             </div>
             <div class="mb-3"><label for="name" class="form-label">Name</label>
                 <input type="text" name="name" class="form-control " id="name">
+                <div id="nameHelp" class="form-text">Try "anna" or "otto" ... they are taken ("fetch" rule)</div>
+
                 <div class="invalid-feedback">
 
                 </div>

@@ -209,6 +209,12 @@ export default class Validator {
         : "Invalid";
   }
 
+  static empty(value){
+    if (Array.isArray(value)) {
+      return value.length == 0;
+    }
+    return value === undefined || value === null || value.length == 0;
+  }
   hey() {
     console.log("huhu");
   }
@@ -246,7 +252,8 @@ export default class Validator {
     }
   }
   get_message(name, rule, rmsg) {
-    let msg = this.rules["m"][name]?.rule
+    let msg = ""
+    if(this.rules["m"][name] && this.rules["m"][name][rule]) msg = this.rules["m"][name][rule]
     if(!msg && rmsg && typeof rmsg==='string') msg=rmsg
     if(!msg) msg =
        messages[rule]
@@ -278,7 +285,7 @@ const methods = {
     // Or use custom methods to implement your own email validation
     // console.log("email-regex for", value);
     return (
-      optional(element) ||
+      Validator.empty(value) ||
       /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
         value
       )
