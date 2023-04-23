@@ -96,8 +96,7 @@ export default class Validator {
         is_click: is_click(el),
         is_array: is_array(el),
       };
-      // console.log("init field", props);
-      this.fields.set(el, props);
+      
       let me = this;
       if (!props.is_click) {
         addEventOnce(el, "input", function () {
@@ -111,10 +110,14 @@ export default class Validator {
           me.clear_ev(e, me);
         });
       } else {
+        props.fresh=false
         addEvent(el, "input", function (e) {
+          console.log("input on click-el", e.target)
           me.validate_ev(e, me);
         });
       }
+      // console.log("init field", props);
+      this.fields.set(el, props);
     }
     const field = this.fields.get(el);
   }
@@ -177,7 +180,7 @@ export default class Validator {
         let promise = Promise.resolve(m(val, el)).then((ok) => {
           console.log("validation result", rule, ok);
           let rsp_msg = this.is_error_msg(ok)
-          if (rsp_msg) msg.push(this.get_message(name, rule));
+          if (rsp_msg) msg.push(this.get_message(name, rule, rsp_msg));
         });
         let r = await promise;
       } else {
@@ -242,12 +245,14 @@ export default class Validator {
       // msg_container.innerHTML = "";
     }
   }
-  get_message(name, rule) {
+  get_message(name, rule, rmsg) {
     let msg = this.rules["m"][name]?.rule
-      ? this.rules["m"][name][rule]
-      : messages[rule]
+    if(!msg && rmsg && typeof rmsg==='string') msg=rmsg
+    if(!msg) msg =
+       messages[rule]
       ? messages[rule]
       : "Error on field " + name + " with rule " + rule;
+    console.log("+++ msg ", name, rule, msg)  
     return format(msg, {});
   }
 }
