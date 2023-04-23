@@ -80,6 +80,11 @@ export default class Validator {
     }
     return fields;
   }
+  update_map(el, prop, prop_val ){
+    let f = this.fields.get(el)
+    f[prop]=prop_val
+    this.fields.set(el, f)
+  }
   update(el, trigger) {
     const name = get_name(el);
     if (!this.fields.has(el)) {
@@ -87,6 +92,7 @@ export default class Validator {
         fresh: true,
         name: name,
         id: el.id,
+        has_error:false,
         is_click: is_click(el),
         is_array: is_array(el),
       };
@@ -100,6 +106,9 @@ export default class Validator {
         });
         addEvent(el, "blur", function (e) {
           me.validate_ev(e, me);
+        });
+        addEvent(el, "input", function (e) {
+          me.clear_ev(e, me);
         });
       } else {
         addEvent(el, "input", function (e) {
@@ -123,6 +132,12 @@ export default class Validator {
     // console.log("validate", e, el);
     // console.log("this", val);
     this.validate(el, get_name(el), val);
+  }
+  clear_ev(e){
+    let p = this.fields.get(e.target)
+    if(p.has_error){
+      this.add_error(e.target, "")
+    } 
   }
   validate_fields(els) {
     let ok = true;
@@ -157,9 +172,11 @@ export default class Validator {
     console.log("+++ adding errors", msg);
     if (msg.length) {
       this.add_error(el, msg);
+      this.update_map(el, 'has_error', true)
       return false;
     } else {
       this.add_error(el, "");
+      this.update_map(el, 'has_error', false)
       return true;
     }
   }
