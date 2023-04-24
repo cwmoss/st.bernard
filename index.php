@@ -1,7 +1,7 @@
 <?php
 // php -S localhost:2023
 $http_method = $_SERVER['REQUEST_METHOD'];
-$path = $_SERVER['REQUEST_URI'];
+$path = $_SERVER['REQUEST_URI'] ?: '/';
 // print file_get_contents('php://input');
 $the_route = match ([$http_method, $path]) {
     ['POST', '/'] => ['index', $_POST],
@@ -125,7 +125,7 @@ $messages = [
         <h1>Testformx</h1>
 
 
-        <form x-data="form()" x-validatetable x-cloak novalidate>
+        <form x-data="form()" x-validatetable="{lazy:true}" x-cloak novalidate>
 
             <div class="mb-3"><label for="email" class="form-label">Email address</label>
                 <input type="email" value="rw" name="email" class="form-control" id="email" aria-describedby="emailHelp">

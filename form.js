@@ -10,10 +10,10 @@ Validator.add_method(
 
 document.addEventListener("alpine:init", () => {
   console.log("alpine-init");
-  Alpine.directive("validatetable", (el) => {
+  Alpine.directive("validatetable", (el, alp_opts, { evaluate }) => {
     // el.textContent = el.textContent.toUpperCase();
     let v = new Validator(el);
-    console.log("rulesX", v);
+    console.log("rulesX", v, evaluate(alp_opts.expression));
 
     el.validate = function () {
       alert("validate!");
