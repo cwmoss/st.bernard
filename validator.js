@@ -80,10 +80,10 @@ export default class Validator {
     }
     return fields;
   }
-  update_map(el, prop, prop_val ){
-    let f = this.fields.get(el)
-    f[prop]=prop_val
-    this.fields.set(el, f)
+  update_map(el, prop, prop_val) {
+    let f = this.fields.get(el);
+    f[prop] = prop_val;
+    this.fields.set(el, f);
   }
   update(el, trigger) {
     const name = get_name(el);
@@ -92,11 +92,11 @@ export default class Validator {
         fresh: true,
         name: name,
         id: el.id,
-        has_error:false,
+        has_error: false,
         is_click: is_click(el),
         is_array: is_array(el),
       };
-      
+
       let me = this;
       if (!props.is_click) {
         addEventOnce(el, "input", function () {
@@ -110,9 +110,9 @@ export default class Validator {
           me.clear_ev(e, me);
         });
       } else {
-        props.fresh=false
+        props.fresh = false;
         addEvent(el, "input", function (e) {
-          console.log("input on click-el", e.target)
+          console.log("input on click-el", e.target);
           me.validate_ev(e, me);
         });
       }
@@ -122,7 +122,8 @@ export default class Validator {
     const field = this.fields.get(el);
   }
   on_submit(e) {
-    console.log("+++ submit", this);
+    console.log("+++ submit", e.submitter, e, this);
+    if (hasAttr(e.submitter, "formnovalidate")) return;
     let fields = this.get_fields(true);
     let ok = this.validate_fields(fields);
     console.log("... all ok?", ok);
@@ -130,7 +131,7 @@ export default class Validator {
   }
   validate_ev(e) {
     let el = e.target;
-    if(this.fields.get(el)?.fresh) return
+    if (this.fields.get(el)?.fresh) return;
 
     let val = this.get_value(el);
 
@@ -138,11 +139,11 @@ export default class Validator {
     // console.log("this", val);
     this.validate(el, get_name(el), val);
   }
-  clear_ev(e){
-    let p = this.fields.get(e.target)
-    if(p.has_error){
-      this.add_error(e.target, "")
-    } 
+  clear_ev(e) {
+    let p = this.fields.get(e.target);
+    if (p.has_error) {
+      this.add_error(e.target, "");
+    }
   }
   validate_fields(els) {
     let ok = true;
@@ -156,17 +157,17 @@ export default class Validator {
     }
     return ok;
   }
-  is_error_msg(rsp){
-    if(rsp===false) return true
-    if(!rsp) return false
-    if(rsp===true) return false
-    if(typeof rsp === 'string') return rsp
-    if(typeof rsp === 'object'){
-      if(rsp.ok===false){
-        return rsp.msg
+  is_error_msg(rsp) {
+    if (rsp === false) return true;
+    if (!rsp) return false;
+    if (rsp === true) return false;
+    if (typeof rsp === "string") return rsp;
+    if (typeof rsp === "object") {
+      if (rsp.ok === false) {
+        return rsp.msg;
       }
     }
-    return false
+    return false;
   }
   async validate(el, name, val) {
     let rules = this.rules.r[name] ? this.rules.r[name] : [];
@@ -179,7 +180,7 @@ export default class Validator {
       if (m) {
         let promise = Promise.resolve(m(val, el)).then((ok) => {
           console.log("validation result", rule, ok);
-          let rsp_msg = this.is_error_msg(ok)
+          let rsp_msg = this.is_error_msg(ok);
           if (rsp_msg) msg.push(this.get_message(name, rule, rsp_msg));
         });
         let r = await promise;
@@ -190,11 +191,11 @@ export default class Validator {
     console.log("+++ adding errors", msg);
     if (msg.length) {
       this.add_error(el, msg);
-      this.update_map(el, 'has_error', true)
+      this.update_map(el, "has_error", true);
       return false;
     } else {
       this.add_error(el, "");
-      this.update_map(el, 'has_error', false)
+      this.update_map(el, "has_error", false);
       return true;
     }
   }
@@ -209,7 +210,7 @@ export default class Validator {
         : "Invalid";
   }
 
-  static empty(value){
+  static empty(value) {
     if (Array.isArray(value)) {
       return value.length == 0;
     }
@@ -252,14 +253,15 @@ export default class Validator {
     }
   }
   get_message(name, rule, rmsg) {
-    let msg = ""
-    if(this.rules["m"][name] && this.rules["m"][name][rule]) msg = this.rules["m"][name][rule]
-    if(!msg && rmsg && typeof rmsg==='string') msg=rmsg
-    if(!msg) msg =
-       messages[rule]
-      ? messages[rule]
-      : "Error on field " + name + " with rule " + rule;
-    console.log("+++ msg ", name, rule, msg)  
+    let msg = "";
+    if (this.rules["m"][name] && this.rules["m"][name][rule])
+      msg = this.rules["m"][name][rule];
+    if (!msg && rmsg && typeof rmsg === "string") msg = rmsg;
+    if (!msg)
+      msg = messages[rule]
+        ? messages[rule]
+        : "Error on field " + name + " with rule " + rule;
+    console.log("+++ msg ", name, rule, msg);
     return format(msg, {});
   }
 }
@@ -376,7 +378,7 @@ const addEventOnce = (el, event, callback) =>
   el.addEventListener(event, callback, { once: true });
 
 const getAttr = (el, attr) => el.getAttribute(attr);
-
+const hasAttr = (el, attr) => el.hasAttribute(attr);
 const setAttr = (el, attr, value = "") => el.setAttribute(attr, value);
 
 const addClass = (el, cls) => el.classList.add(cls);

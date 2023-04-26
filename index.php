@@ -1,7 +1,9 @@
 <?php
 // php -S localhost:2023
 $http_method = $_SERVER['REQUEST_METHOD'];
-$path = $_SERVER['REQUEST_URI'] ?: '/';
+// $path = $_SERVER['REQUEST_URI'] ?: '/';
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+dbg($_SERVER);
 // print file_get_contents('php://input');
 $the_route = match ([$http_method, $path]) {
     ['POST', '/'] => ['index', $_POST],
@@ -23,7 +25,10 @@ function handle_request($page, $params = []) {
         print "404";
     }
 }
-
+function dbg($d) {
+    // fwrite(STDERR, var_export($d, true));
+    file_put_contents("php://stderr", var_export($d, true), FILE_APPEND | LOCK_EX);
+}
 function json_resp($data) {
     header('Content-Type: application/json');
     print json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -106,6 +111,14 @@ $messages = [
             background-position: calc(100% - 8px) 8px;
             background-repeat: no-repeat;
         }
+
+        .default-button {
+            width: 0;
+            height: 0;
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
     </style>
 
     <script type="module" src="form.js?<?= time() ?>"></script>
@@ -150,7 +163,7 @@ $messages = [
                 </div>
             </div>
 
-            <div class="mb-3" x-show="has_friends" x-transition>
+            <div class="mb-3" x-show="has_friends==1" x-transition>
                 <div><label for="nickname" class="form-label">...they call me</label>
                     <input type="text" name="nickname" class="form-control " id="nickname">
                     <div class="invalid-feedback">
@@ -203,7 +216,12 @@ $messages = [
             <template x-if="isopen">
                 <div>Sending...</div>
             </template>
-            <button @click="toggle" type="submit" class="btn btn-primary">Submit</button>
+
+            <button type="submit" name="action" value="default-action" class="default-button" aria-hidden="true" tabindex="-1"></button>
+
+            <button class="btn btn-secondary" type="reset">Reset</button>
+            <button class="btn btn-secondary" formnovalidate type="submit">Cancel</button>
+            <button @click="toggle" type="submit" class="btn btn-primary mx-5">Submit</button>
 
         </form>
 

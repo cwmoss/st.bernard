@@ -24,7 +24,7 @@ document.addEventListener("alpine:init", () => {
 
   Alpine.data("form", () => ({
     isopen: false,
-    has_friends: false,
+    has_friends: 0,
     xxinit() {
       console.log("init");
       let rules = JSON.parse(this.$refs.vrules.dataset.rules);
